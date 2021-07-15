@@ -135,7 +135,7 @@ export class {{cs_name Name}}Detail extends Component<{{cs_name Name}}DetailProp
 				{{cml_case Name}}Contents = <Loading />;			
 			}
 			else {
-                {{cml_case Name}}Contents = <{{cs_name SelectAllType.Name}}List data={ this.state.{{cml_case Name}}Data } linkedType='{{../Name}}' linkedId={this.state.data ? this.state.data.id : null} />;		
+                {{cml_case Name}}Contents = <{{cs_name SelectAllType.Name}}List data={ this.state.{{cml_case Name}}Data } dataProvided={true} linkedType='{{../Name}}' linkedId={this.state.data ? this.state.data.id : null} />;		
 			}
         }
 		{{/each}}
