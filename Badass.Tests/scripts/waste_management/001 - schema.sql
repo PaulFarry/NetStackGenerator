@@ -15,14 +15,32 @@ ALTER SEQUENCE user_id_seq RESTART WITH 2;
 
 COMMENT ON TABLE public.user IS '{"noAddUI":true, "noEditUI":true, "isSecurityPrincipal":true, "createPolicy":false}';
 
+create table government_area_logo (
+                              id serial primary key not null,
+                              name text not null,
+                              mime_type text not null,
+                              contents bytea not null,
+                              created_by int references "user" (id) not null,
+                              created timestamp with time zone not null,
+                              modified_by int references "user"(id),
+                              modified timestamp with time zone
+);
+
+COMMENT ON TABLE public.government_area_logo IS '{"isAttachment":true}';
+COMMENT ON COLUMN public.government_area_logo.mime_type IS '{"isContentType": true}';
+
 create table government_area (
                                  id serial primary key not null,
                                  name text not null,
+                                 logo_id int references government_area_logo(id),
+                                 color char(7),
                                  created_by int not null references "user"(id),
                                  created timestamp with time zone not null,
                                  modified_by int references "user"(id),
                                  modified timestamp with time zone
 );
+
+COMMENT ON COLUMN public.government_area.color IS '{"type": "color"}';
 
 create table address_file (
                               id serial primary key not null,
@@ -102,10 +120,11 @@ create table address (
                          id serial primary key not null,
                          government_area_id int not null references government_area(id),
                          unit_number text,
-                         street_number text,
+                         street_number text not null,
                          street_name text not null,
                          suburb_locale text not null,
                          post_code char(4) not null,
+                         display text generated always as (coalesce(unit_number || '/', '') || street_number || ' ' || street_name || ' ' || suburb_locale) stored, 
                          validation_code text,
                          latitude float,
                          longitude float,

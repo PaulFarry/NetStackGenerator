@@ -53,7 +53,9 @@ namespace Badass.Model
 
         public string ProviderTypeName { get; set; }
         
-        public bool IsCallerProvided => !IsAutoAssignedIdentity && !IsTrackingDate && !IsDelete && !IsTrackingUser && !IsSearch && !IsExcludedFromResults;
+        public bool IsGenerated { get; set; }
+        
+        public bool IsCallerProvided => !IsAutoAssignedIdentity && !IsTrackingDate && !IsDelete && !IsTrackingUser && !IsSearch && !IsExcludedFromResults && !IsGenerated;
 
         public bool IsUserEditable => IsCallerProvided && !IsAttachmentThumbnail && !IsAttachmentContentType;
 

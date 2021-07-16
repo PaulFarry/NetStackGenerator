@@ -1548,6 +1548,7 @@ namespace Badass.Postgres
                     {
                         var fieldName = reader["column_name"].ToString();
                         var isNullable = reader["is_nullable"].ToString() == "YES";
+                        var isGenerated = reader["is_generated"].ToString() == "ALWAYS";
 
                         var field = type.Fields.FirstOrDefault(f => f.Name == fieldName);
                         if (field == null)
@@ -1557,6 +1558,7 @@ namespace Badass.Postgres
                         else
                         {
                             field.IsRequired = !isNullable;
+                            field.IsGenerated = isGenerated;
                             var clrTypeIsNullable = (!field.ClrType.IsValueType || Nullable.GetUnderlyingType(field.ClrType) != null);
                             if (isNullable && !ClrTypeIsNullable(field.ClrType))
                             {

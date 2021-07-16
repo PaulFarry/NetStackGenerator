@@ -80,7 +80,7 @@ namespace Badass.Templating.DatabaseFunctions.Adapters
 
         private string GetSearchFieldsAsTsVector()
         {
-            var textFields = _parent.Fields.Where(f => f.ClrType == typeof(string)).Select(f => f.Value);
+            var textFields = _parent.Fields.Where(f => f.ClrType == typeof(string) && !f.IsGenerated).Select(f => f.Value);
             return "to_tsvector(" + string.Join(" || ' ' || ", textFields) + ")";
         }
 
@@ -116,5 +116,7 @@ namespace Badass.Templating.DatabaseFunctions.Adapters
         public int? Size => _field.Size;
 
         public Type ClrType => _field.ClrType;
+
+        public bool IsGenerated => _field.IsGenerated;
     }
 }
