@@ -142,6 +142,8 @@ namespace Badass.Model
 
         public bool Edit => Attributes?.edit != null ? Attributes.edit : !IsIdentity;
 
+        public bool IsDisplayField => Attributes?.isDisplayForType != null ? Attributes.isDisplayForType : false;
+
         public bool IsInt => ClrType == typeof(int);
 
         public Field RelatedTypeField

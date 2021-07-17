@@ -19,6 +19,7 @@ create table government_area_logo (
                               id serial primary key not null,
                               name text not null,
                               mime_type text not null,
+                              thumbnail bytea not null,
                               contents bytea not null,
                               created_by int references "user" (id) not null,
                               created timestamp with time zone not null,
@@ -26,7 +27,7 @@ create table government_area_logo (
                               modified timestamp with time zone
 );
 
-COMMENT ON TABLE public.government_area_logo IS '{"isAttachment":true}';
+COMMENT ON TABLE public.government_area_logo IS '{"isAttachment":true, "security":{"anon":["read"]}}'; -- anon-read is a bit of a hack
 COMMENT ON COLUMN public.government_area_logo.mime_type IS '{"isContentType": true}';
 
 create table government_area (
@@ -137,6 +138,8 @@ create table address (
                          modified timestamp with time zone
 );
 
+COMMENT ON COLUMN public.address.display IS '{"isDisplayForType": true}';
+
 create table waste_type (
                             id serial primary key not null,
                             name text not null,
@@ -228,6 +231,7 @@ grant usage, select on waste_type_id_seq to web_app_role;
 grant usage, select on bin_size_id_seq to web_app_role;
 grant usage, select on service_type_id_seq to web_app_role;
 grant usage, select on bin_id_seq to web_app_role;
+grant usage, select on government_area_logo_id_seq to web_app_role;
 
 SET search_path TO "public";
 

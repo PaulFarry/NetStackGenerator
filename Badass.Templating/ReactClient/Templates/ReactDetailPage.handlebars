@@ -88,7 +88,7 @@ export class {{cs_name Name}}Detail extends Component<{{cs_name Name}}DetailProp
                         <td><Stars count={ data.{{cml_case Name}} } /></td>
                                 {{else}}
 									{{#if IsLinkingFieldToAttachmentWithThumbnail}}
-						<td><Thumbnail id={ data.{{cml_case LinkingField.Name}} } name={ data.{{cml_case Name}} } entityName="{{cml_case RelatedType.Name}}" /></td>
+						<td><Thumbnail id={ data.{{cml_case LinkingField.Name}} } name={ data.{{cml_case Name}} } entityName="{{kb_case RelatedType.Name}}" /></td>
 									{{else}}
 						<td>{ data.{{cml_case Name}} }</td>
 									{{/if}}		
