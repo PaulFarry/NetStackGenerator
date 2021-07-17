@@ -208,13 +208,18 @@ namespace Badass.Postgres
 
                                 if (getAllDetails)
                                 {
+                                    if (op.Attributes?.applicationtype != null)
+                                    {
+                                        SetOperationRelatedType(op, domain);
+                                    }
+                                    
                                     var parameters = reader["argument_types"].ToString();
                                     if (!string.IsNullOrEmpty(parameters))
                                     {
                                         op.Parameters.AddRange(ReadParameters(parameters, domain, op));
-                                        if (op.Attributes?.applicationtype != null)
+                                        if (op.RelatedType != null)
                                         {
-                                            UpdateParameterNullabilityFromApplicationType(op, domain);
+                                            UpdateParameterNullabilityFromApplicationType(op);
                                         }
                                     }
 
@@ -353,6 +358,39 @@ namespace Badass.Postgres
             return PostgresType.IsTimeOnly(typeName);
         }
 
+        public void AddTestData(List<CodeFile> scripts)
+        {
+            var failedScripts = new List<CodeFile>();
+
+            foreach (var script in scripts)
+            {
+                try
+                {
+                    ExecuteCommandText(script.Contents, false);
+                }
+                catch (PostgresException)
+                {
+                    failedScripts.Add(script);
+                }
+            }
+
+            if (failedScripts.Any())
+            {
+                Log.Information("Attempting to re-run {Count} failed data scripts", failedScripts.Count);
+                foreach (var script in failedScripts)
+                {
+                    try
+                    {
+                        ExecuteCommandText(script.Contents);
+                    }
+                    catch (PostgresException pgEx)
+                    {
+                        Log.Warning("Test data script {ScriptName} failed with error {Error}", script.Name, pgEx);
+                    }
+                }
+            }
+        }
+        
         public static NpgsqlDbType GetNpgsqlDbTypeFromPostgresType(string postgresTypeName)
         {
             if (_postgresNpgSqlTypes.ContainsKey(postgresTypeName))
@@ -1001,7 +1039,7 @@ namespace Badass.Postgres
             ExecuteCommandText(cmdText);
         }
 
-        private void ExecuteCommandText(string text)
+        private void ExecuteCommandText(string text, bool log = true)
         {
             try
             {
@@ -1015,7 +1053,10 @@ namespace Badass.Postgres
             }
             catch (Exception ex)
             {
-                Log.Error(ex, ex.Message + Environment.NewLine + "-----------------------------------------" + Environment.NewLine + "Attempted To Execute: " + Environment.NewLine + text + Environment.NewLine);
+                if (log)
+                {
+                    Log.Error(ex, ex.Message + Environment.NewLine + "-----------------------------------------" + Environment.NewLine + "Attempted To Execute: " + Environment.NewLine + text + Environment.NewLine);
+                }
                 throw ex;
             }
         }
@@ -1480,7 +1521,7 @@ namespace Badass.Postgres
                 }  
             }
             
-            var parameter = new Parameter(domain) {Name = n.Name, ProviderTypeName = n.Type.Name, ClrType = type };
+            var parameter = new Parameter(domain, operation) {Name = n.Name, ProviderTypeName = n.Type.Name, ClrType = type };
             return parameter;
         }
 
@@ -1507,6 +1548,7 @@ namespace Badass.Postgres
                     {
                         var fieldName = reader["column_name"].ToString();
                         var isNullable = reader["is_nullable"].ToString() == "YES";
+                        var isGenerated = reader["is_generated"].ToString() == "ALWAYS";
 
                         var field = type.Fields.FirstOrDefault(f => f.Name == fieldName);
                         if (field == null)
@@ -1516,6 +1558,7 @@ namespace Badass.Postgres
                         else
                         {
                             field.IsRequired = !isNullable;
+                            field.IsGenerated = isGenerated;
                             var clrTypeIsNullable = (!field.ClrType.IsValueType || Nullable.GetUnderlyingType(field.ClrType) != null);
                             if (isNullable && !ClrTypeIsNullable(field.ClrType))
                             {
@@ -1673,22 +1716,16 @@ AND KCU1.TABLE_SCHEMA = '{type.Namespace}'
             }
         }
 
-        private void UpdateParameterNullabilityFromApplicationType(Operation op, Domain domain)
+        private void UpdateParameterNullabilityFromApplicationType(Operation op)
         {
-            var appTypeName = op.Attributes.applicationtype.ToString();
-            var appType = domain.Types.FirstOrDefault(t => t.Name == appTypeName);
-            if (appType == null)
+            if (op.RelatedType == null)
             {
-                Log.Error($"Unable to find application type {appTypeName} for operation {op.Name}");
                 return;
             }
-
-            op.RelatedType = appType;
-
+            
             foreach (var prm in op.Parameters)
             {
-                
-                var fld = appType.Fields.FirstOrDefault(f => f.Name == prm.Name);
+                var fld = op.RelatedType.Fields.FirstOrDefault(f => f.Name == prm.Name);
                 if (fld != null)
                 {
                     UpdateParamFromField(prm, fld);
@@ -1703,7 +1740,7 @@ AND KCU1.TABLE_SCHEMA = '{type.Namespace}'
                     {
                         // since this matching above is done by name, it misses some things e.g. where the parameter is called id_param and the field is called id.
                         // here we 'fall back' to try to fix that
-                        var paramFld = appType.Fields.FirstOrDefault(f => f.Name + "_param" == prm.Name);
+                        var paramFld = op.RelatedType.Fields.FirstOrDefault(f => f.Name + "_param" == prm.Name);
                         if (paramFld != null)
                         {
                             UpdateParamFromField(prm, paramFld);
@@ -1711,7 +1748,18 @@ AND KCU1.TABLE_SCHEMA = '{type.Namespace}'
                     }
                 }
             }
+        }
 
+        private void SetOperationRelatedType(Operation op, Domain domain)
+        {
+            var appTypeName = op.Attributes.applicationtype.ToString();
+            var appType = domain.Types.FirstOrDefault(t => t.Name == appTypeName);
+            if (appType == null)
+            {
+                Log.Error($"Unable to find application type {appTypeName} for operation {op.Name}");
+            }
+
+            op.RelatedType = appType;
         }
 
         private static void UpdateParamFromField(Parameter prm, Field fld)

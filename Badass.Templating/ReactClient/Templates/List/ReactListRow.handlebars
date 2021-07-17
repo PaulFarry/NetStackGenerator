@@ -37,7 +37,7 @@ export class {{cs_name Name}}Row extends Component<{{cs_name Name}}RowProps, any
                             <td><span className="small" style={ { whiteSpace: "nowrap" } }><Stars count={ s.{{cml_case Name}} } /></span></td>
                                                 {{else}}
                                                     {{#if IsLinkingFieldToAttachmentWithThumbnail}}
-                            <td><Thumbnail id={ s.{{cml_case LinkingField.Name}} } name={ s.{{cml_case Name}} }  entityName="{{cml_case RelatedType.Name}}" /></td>
+                            <td><Thumbnail id={ s.{{cml_case LinkingField.Name}} } name={ s.{{cml_case Name}} }  entityName="{{kb_case RelatedType.Name}}" /></td>
                                                     {{else}}
                             <td>{ s.{{cml_case Name}} }</td>
                                                     {{/if}}
@@ -48,7 +48,7 @@ export class {{cs_name Name}}Row extends Component<{{cs_name Name}}RowProps, any
                                 {{/if}}
 							{{/each}}
                             {{#if UnderlyingType.IsAttachmentWithThumbnail}}
-                            <td> <Thumbnail id={s.id} name={ s.{{cml_case DisplayField.Name}} } entityName="{{cml_case UnderlyingType.Name}}" /> </td>
+                            <td> <Thumbnail id={s.id} name={ s.{{cml_case DisplayField.Name}} } entityName="{{kb_case UnderlyingType.Name}}" /> </td>
                             {{/if}}
 							{{#if UnderlyingType.HasDetails}}
 							<td>

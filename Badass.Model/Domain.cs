@@ -7,11 +7,11 @@ namespace Badass.Model
     {
         public ITypeProvider TypeProvider { get; }
         
-        private readonly Settings _settings;
+        public Settings Settings { get; }
 
         public Domain(Settings settings, ITypeProvider typeProvider)
         {
-            _settings = settings;
+            Settings = settings;
             Types = new List<ApplicationType>();
             Operations = new List<Operation>();
             ResultTypes = new List<ResultType>();
@@ -30,25 +30,26 @@ namespace Badass.Model
         {
             get
             {
-                if (_settings.TypeName != null)
+                if (Settings.TypeName != null)
                 {
-                    return Types.Where(t => t.Name == _settings.TypeName).ToList();
+                    return Types.Where(t => t.Name == Settings.TypeName).ToList();
                 }
 
                 return Types;
             }
         }
 
-        public List<string> ExcludedSchemas => _settings.ExcludedSchemas;
+        public List<string> ExcludedSchemas => Settings.ExcludedSchemas;
 
+        public ApplicationType UserType => Types.SingleOrDefault(t => t.IsSecurityPrincipal);
+        
         public Field UserIdentity
         {
             get
             {
-                var userType = Types.SingleOrDefault(t => t.IsSecurityPrincipal);
-                if (userType != null)
+                if (UserType != null)
                 {
-                    var id = userType.Fields.Single(f => f.IsIdentity);
+                    var id = UserType.Fields.Single(f => f.IsIdentity);
                     return id;
                 }
 

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 
 namespace Badass.Model
 {
@@ -24,5 +25,7 @@ namespace Badass.Model
         public bool IsDateOnly(string typeName);
 
         public bool IsTimeOnly(string typeName);
+
+        public void AddTestData(List<CodeFile> scripts);
     }
 }

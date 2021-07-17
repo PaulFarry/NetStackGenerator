@@ -279,7 +279,8 @@ create table question (
 	notes text,
 	display_order int,
 	required bool,
-	deleted_date timestamp with time zone
+	deleted_date timestamp with time zone,
+    search_content tsvector
 );
 
 COMMENT ON TABLE public.question IS '{"security":{"anon":["read", "list"]}}';
@@ -301,7 +302,7 @@ create table response (
 	created timestamp with time zone
 );
 
-COMMENT ON TABLE public.response IS '{"security":{"anon":["add"], "user":["read", "list"], "admin":["read", "read-all", "list"]}}';
+COMMENT ON TABLE public.response IS '{"security":{"anon":["add"], "user":["read", "list"], "admin":["read", "read-all", "list"]}, "paged":true}';
 
 create table answer (
 	id serial primary key not null,

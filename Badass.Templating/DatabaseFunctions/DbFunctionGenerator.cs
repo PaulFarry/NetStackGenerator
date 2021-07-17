@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Badass.Model;
 using Badass.Templating.DatabaseFunctions.Adapters;
+using Serilog;
 using Constraint = Badass.Model.Constraint;
 
 namespace Badass.Templating.DatabaseFunctions
@@ -24,11 +25,17 @@ namespace Badass.Templating.DatabaseFunctions
 
             var files = new List<CodeFile>();
 
+            var skipPolicyGeneration = domain.UserType == null;
+            if (skipPolicyGeneration)
+            {
+                Log.Warning("Skipping security policy generation because no domain user type is defined");
+            }
+            
             foreach (var type in domain.FilteredTypes)
             {
                 if (!type.Ignore)
                 {
-                    if (settings.GenerateSecurityPolicies && type.Attributes?.createPolicy != false)
+                    if (settings.GenerateSecurityPolicies && type.Attributes?.createPolicy != false && !skipPolicyGeneration)
                     {
                         files.Add(GenerateSecurityPoicy(type, domain));
                     }
@@ -46,15 +53,20 @@ namespace Badass.Templating.DatabaseFunctions
                     
                     files.Add(GenerateInsertFunction(type, domain));
 
+                    files.Add(GenerateDisplayType(type, domain));
                     files.Add(GenerateSelectAllFunction(type, domain));
+                    files.Add(GenerateSelectAllForDisplayFunction(type, domain));
 
+                    if (type.Paged)
+                    {
+                        files.Add(GeneratePagedOrderedSelectFunction(type, domain));
+                        files.Add(GenerateSelectPagedForDisplayFunction(type, domain));
+                    }
                     
                     if (adapter.UpdateFields.Any())
                     {
                         files.Add(GenerateUpdateFunction(adapter));
                     }
-
-                    files.Add(GenerateDisplayType(type, domain));
 
                     if (type.Fields.Count(f => f.IsIdentity) == 1)
                     {
@@ -72,6 +84,12 @@ namespace Badass.Templating.DatabaseFunctions
                         {
                             files.Add(GenerateSelectByRelatedTypeFunction(type, field, domain));
                             files.Add(GenerateSelectAllForDisplayByRelatedTypeFunction(type, field, domain));
+                            
+                            if (type.Paged)
+                            {
+                                files.Add(GeneratePagedSelectByRelatedTypeFunction(type, field, domain));
+                                files.Add(GeneratePagedSelectForDisplayByRelatedTypeFunction(type, field, domain));
+                            }
                         }
                     }
 
@@ -98,9 +116,6 @@ namespace Badass.Templating.DatabaseFunctions
                         files.Add(GenerateSearchFunction(type, domain));
                     }
 
-                    files.Add(GenerateSelectAllFunction(type, domain));
-                    files.Add(GenerateSelectAllForDisplayFunction(type, domain));
-
                     if (!type.IsSecurityPrincipal)
                     {
                         // find all the link types that reference this type
@@ -113,6 +128,13 @@ namespace Badass.Templating.DatabaseFunctions
                                 if (linkAdapter.LinkingTypeField != null && linkAdapter.LinkTypeOtherField != null)
                                 {
                                     files.Add(GenerateTemplateFromAdapter(linkAdapter, "SelectAllForDisplayViaLinkTemplate"));
+                                    
+                                    if (type.Paged)
+                                    {
+                                        var pagedLinkAdapter = new SelectPagedForDisplayViaLinkDbTypeAdapter(type,
+                                            SelectAllForDisplayFunctionName, linkingType, domain);
+                                        files.Add(GenerateTemplateFromAdapter(pagedLinkAdapter, "SelectPagedForDisplayViaLink"));
+                                    }
                                 }
                             }
                         }
@@ -150,11 +172,23 @@ namespace Badass.Templating.DatabaseFunctions
             var adapter = new SelectByFieldsDbTypeAdapter(type, $"select_by_{field.Name}", new List<Field> { field }, OperationType.Select, domain, false);
             return GenerateTemplateFromAdapter(adapter, "SelectByForeignKeyTemplate");
         }
+        
+        private CodeFile GeneratePagedSelectByRelatedTypeFunction(ApplicationType type, Field field, Domain domain)
+        {
+            var adapter = new SelectPagedByFieldsDbTypeAdapter(type, $"select_paged_by_{field.Name}", new List<Field> { field }, OperationType.Select, domain);
+            return GenerateTemplateFromAdapter(adapter, "SelectPagedByForeignKey");
+        }
 
         private CodeFile GenerateSelectAllForDisplayByRelatedTypeFunction(ApplicationType type, Field field, Domain domain)
         {
             var adapter = new SelectByFieldsForDisplayDbTypeAdapter(type, $"select_for_display_by_{field.Name}", new List<Field> { field }, domain);
             return GenerateTemplateFromAdapter(adapter, "SelectAllForDisplayByForeignKeyTemplate");
+        }
+        
+        private CodeFile GeneratePagedSelectForDisplayByRelatedTypeFunction(ApplicationType type, Field field, Domain domain)
+        {
+            var adapter = new SelectPagedByFieldsForDisplayDbTypeAdapter(type, $"select_paged_for_display_by_{field.Name}", new List<Field> { field }, domain);
+            return GenerateTemplateFromAdapter(adapter, "SelectPagedForDisplayByForeignKey");
         }
 
         private CodeFile GenerateSelectByPrimaryKeyFunction(ApplicationType type, Field field, Domain domain)
@@ -188,6 +222,12 @@ namespace Badass.Templating.DatabaseFunctions
             return GenerateTemplateFromAdapter(adapter, "SelectAllTemplate");
         }
 
+        private CodeFile GeneratePagedOrderedSelectFunction(ApplicationType applicationType, Domain domain)
+        {
+            var adapter = new PagedDbTypeAdapter(applicationType, OperationType.Select, domain);
+            return GenerateTemplateFromAdapter(adapter, "SelectPaged");
+        }
+        
         private CodeFile GenerateDisplayType(ApplicationType type, Domain domain)
         {
             var adapter = new SelectForDisplayDbTypeAdapter(type, "display", domain);
@@ -210,6 +250,12 @@ namespace Badass.Templating.DatabaseFunctions
         {
             var adapter = new SelectForDisplayDbTypeAdapter(applicationType, SelectAllForDisplayFunctionName, domain);
             return GenerateTemplateFromAdapter(adapter, "SelectAllForDisplayTemplate");
+        }
+        
+        private CodeFile GenerateSelectPagedForDisplayFunction(ApplicationType applicationType, Domain domain)
+        {
+            var adapter = new SelectPagedForDisplayDbTypeAdapter(applicationType, domain);
+            return GenerateTemplateFromAdapter(adapter, "SelectPagedForDisplay");
         }
 
         private CodeFile GenerateSearchFunction(ApplicationType applicationType, Domain domain)

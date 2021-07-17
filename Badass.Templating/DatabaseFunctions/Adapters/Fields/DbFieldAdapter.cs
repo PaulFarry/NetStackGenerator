@@ -44,7 +44,7 @@ namespace Badass.Templating.DatabaseFunctions.Adapters
                         return _parent.FunctionName + "." + _field.Name;    
                     }
 
-                    if (_parent.UserEditableFields.Count == 1)
+                    if (!_parent.UsesCustomInsertType)
                     {
                         return _parent.FunctionName + "." + _field.Name;
                     }
@@ -80,7 +80,7 @@ namespace Badass.Templating.DatabaseFunctions.Adapters
 
         private string GetSearchFieldsAsTsVector()
         {
-            var textFields = _parent.UnderlyingType.Fields.Where(f => f.ClrType == typeof(string)).Select(f => _parent.FunctionName + "." + f.Name);
+            var textFields = _parent.Fields.Where(f => f.ClrType == typeof(string) && !f.IsGenerated).Select(f => f.Value);
             return "to_tsvector(" + string.Join(" || ' ' || ", textFields) + ")";
         }
 
@@ -107,12 +107,16 @@ namespace Badass.Templating.DatabaseFunctions.Adapters
         public bool Add => _field.Add;
         public bool Edit => _field.Edit;
 
-        public bool IsUserEditable => _field.IsUserEditable();
+        public bool IsUserEditable => _field.IsCallerProvided;
         public bool IsIdentity => _field.IsIdentity;
         public bool IsInt => _field.IsInt;
 
         public bool HasSize => _field.Size != null;
 
         public int? Size => _field.Size;
+
+        public Type ClrType => _field.ClrType;
+
+        public bool IsGenerated => _field.IsGenerated;
     }
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using Badass.Model;
 using Badass.Templating.Classes;
+using Badass.Templating.Classes.Adapters;
 using Badass.Templating.DatabaseFunctions;
 using Badass.Templating.DatabaseFunctions.Adapters;
 using Serilog;
@@ -36,7 +37,7 @@ namespace Badass.Templating.ReactClient.Adapters
                             var idField = _underlyingType.Fields.FirstOrDefault(f => f.Name == nameWithoutDisplaySuffix);
                             if (idField != null)
                             {
-                                if (idField.IsUserEditable()) // not sure why we check to see if the Id field is user editable
+                                if (idField.IsCallerProvided) // not sure why we check to see if the Id field is user editable
                                 {
                                     displayFields.Add(new DisplayFieldAdapter(field, Util.HumanizeName(idField), idField, _domain));
                                 }
@@ -60,7 +61,7 @@ namespace Badass.Templating.ReactClient.Adapters
                             continue;
                         }
 
-                        if (underlyingField.IsUserEditable())
+                        if (underlyingField.IsCallerProvided)
                         {
                             displayFields.Add(new DisplayFieldAdapter(field, Util.HumanizeName(field)));
                         }
@@ -76,7 +77,7 @@ namespace Badass.Templating.ReactClient.Adapters
         // the operations exposed to the template by the ListViewAdapter are only ones that don't take any parameters
         public override List<OperationAdapter> Operations
         {
-            get { return _domain.Operations.Where(op => op.Returns.SimpleReturnType == _type && op.Parameters.Count(p => !p.IsSecurityUser) == 0).Select(o => new OperationAdapter(o, base._domain, _underlyingType)).ToList(); }
+            get { return _domain.Operations.Where(op => op.Returns.SimpleReturnType == _type && !op.SingleResult && op.Parameters.Count(p => !p.IsSecurityUser) == 0).Select(o => new OperationAdapter(o, base._domain, _underlyingType)).ToList(); }
         }
 
         public bool HasOperations => Operations.Count > 0;

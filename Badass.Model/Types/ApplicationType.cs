@@ -47,7 +47,7 @@ namespace Badass.Model
         {
             get
             {
-                return Fields.Count(f => f.HasReferenceType) > 1 && !Fields.Any(f => f.IsUserEditable() && !f.HasReferenceType);
+                return Fields.Count(f => f.HasReferenceType && f.IsCallerProvided) == 2 && !Fields.Any(f => f.IsCallerProvided && !f.HasReferenceType);
             }
         }
 
@@ -72,6 +72,7 @@ namespace Badass.Model
         }
 
         public bool Important => Attributes?.important == true;
+        public bool Paged => Attributes?.paged == true;
     }
 
     public enum DeleteType

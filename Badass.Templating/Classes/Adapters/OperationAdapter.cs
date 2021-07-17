@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Badass.Model;
 using System.Linq;
+using Badass.Model;
 using Badass.Templating.DatabaseFunctions;
 using Serilog;
 
-namespace Badass.Templating.Classes
+namespace Badass.Templating.Classes.Adapters
 {
     public class OperationAdapter
     {
@@ -16,7 +16,7 @@ namespace Badass.Templating.Classes
 
         protected readonly Operation _op;
         protected readonly Domain _domain;
-        private readonly ApplicationType _type;
+        protected readonly ApplicationType _type;
 
         public OperationAdapter(Operation op, Domain domain, ApplicationType type)
         {
@@ -65,6 +65,8 @@ namespace Badass.Templating.Classes
             get { return UserProvidedParameters.Where(p => p.UserEditable).OrderBy(p => p.RelatedTypeField?.Rank).ToList(); }
         }
 
+        public bool ChangesOrCreatesData => _op.ChangesOrCreatesData;
+        
         public string ReturnTypeName
         {
             get
@@ -348,6 +350,29 @@ namespace Badass.Templating.Classes
         public bool ApiHooks
         {
             get { return _op.Attributes?.apiHooks == true || _type.Attributes?.apiHooks == "all" || _type.Attributes?.apiHooks == "modify" && (_op.ChangesData || _op.CreatesNew); }
+        }
+        
+        public ClientCustomTypeModel CustomType
+        {
+            get
+            {
+                if (UsesModel)
+                {
+                    return new ClientCustomTypeModel(this, _domain);
+                }
+
+                // this doesn't support multiple custom result types as parameters
+                var customParam = Parameters.Single(p => p.IsCustomTypeOrCustomArray);
+                return new ClientCustomTypeModel(customParam.CustomType);
+            }
+        }
+
+        public IEnumerable<ParameterAdapter> CustomTypeParameters
+        {
+            get
+            {
+                return Parameters.Where(p => p.IsCustomTypeOrCustomArray);
+            }
         }
     }
 }

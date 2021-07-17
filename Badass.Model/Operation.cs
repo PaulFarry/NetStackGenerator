@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using Serilog;
 
 namespace Badass.Model
@@ -42,14 +41,25 @@ namespace Badass.Model
         {
             get
             {
-                return Parameters.Where(p =>
-                    p.RelatedTypeField?.IsTrackingUser != true &&
-                    p.RelatedTypeField?.IsAttachmentContentType != true &&
-                    p.RelatedTypeField?.IsAttachmentThumbnail != true &&
-                    !p.IsSecurityUser).ToList();
+                if (ChangesOrCreatesData)
+                {
+                    return Parameters.Where(p =>
+                        p.RelatedTypeField?.IsTrackingUser != true &&
+                        p.RelatedTypeField?.IsAttachmentContentType != true &&
+                        p.RelatedTypeField?.IsAttachmentThumbnail != true &&
+                        !p.IsSecurityUser).ToList();
+                }
+                else
+                {
+                    return Parameters.Where(p =>
+                        p.RelatedTypeField?.IsAttachmentThumbnail != true &&
+                        !p.IsSecurityUser).ToList();
+                }
             }
         }
 
+        public bool ChangesOrCreatesData => ChangesData || CreatesNew;
+        
         public OperationReturn Returns { get; set; }
 
         public bool Ignore => Attributes?.ignore == true;

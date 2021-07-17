@@ -6,11 +6,11 @@ using System.Text;
 using Badass.OpenApi;
 using Badass.ProjectGeneration;
 using Badass.Model;
-using Badass.Templating;
 using Badass.Templating.Classes;
 using Badass.Templating.DatabaseFunctions;
 using Badass.Templating.MvcViews;
 using Badass.Templating.ReactClient;
+using Badass.Templating.TestData;
 using Serilog;
 
 namespace Badass.Console
@@ -60,7 +60,7 @@ namespace Badass.Console
 
         public void Generate(ITypeProvider typeProvider)
         {
-            Log.Information($"Starting Code Generation");
+            Log.Information("Starting Code Generation in {RootDirectory}", _settings.RootDirectory);
 
             if (_settings.NewAppSettings?.CreateNew == true)
             {
@@ -107,6 +107,7 @@ namespace Badass.Console
 
             if (_settings.GenerateTestRepos && !string.IsNullOrEmpty(_settings.TestDataDirectory))
             {
+                // this is very much a work-in-progress
                 GenerateTestRepositories(domain);
                 Log.Information("Finished generating test repositories");
             }
@@ -147,6 +148,16 @@ namespace Badass.Console
             {
                 var flutterGen = new Flutter.Generator(_fs, _settings, _fileWriter);
                 flutterGen.Generate(domain);
+            }
+
+            if (_settings.TestDataSize != null && _settings.TestDataSize > 0)
+            {
+                var testDataGen = new TestDataGenerator();
+                var testData = testDataGen.Generate(domain);
+                if (testData.Any())
+                {
+                    typeProvider.AddTestData(testData);
+                }
             }
             
             Log.Information("Finished Code Generation");

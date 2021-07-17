@@ -2,6 +2,7 @@
 using System.Linq;
 using Badass.Model;
 using Badass.Templating.Classes;
+using Badass.Templating.Classes.Adapters;
 using Badass.Templating.DatabaseFunctions;
 using Badass.Templating.DatabaseFunctions.Adapters;
 using Serilog;
@@ -19,6 +20,10 @@ namespace Badass.Templating.ReactClient.Adapters
             _applicationType = type;
         }
 
+        public string ClientApiTypeName => Util.CSharpNameFromName(_type.Name) + "ApiClient";
+
+        public string ClientApiInterfaceName => "I" + ClientApiTypeName;
+        
         public List<SimpleType> DistinctOperationReturnTypes
         {
             get
@@ -123,7 +128,7 @@ namespace Badass.Templating.ReactClient.Adapters
 
         public List<DisplayFieldAdapter> UserEditableDisplayFields
         {
-            get { return DisplayFields.Where(f => f.IsUserEditable()).ToList(); }
+            get { return DisplayFields.Where(f => f.IsCallerProvided).ToList(); }
         }
 
         public bool HasDisplayField => _type.DisplayField != null;

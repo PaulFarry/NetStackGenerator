@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Badass.Model;
+using Badass.Templating.Classes.Adapters;
 
 namespace Badass.Templating.Classes
 {
@@ -9,7 +10,7 @@ namespace Badass.Templating.Classes
     {
         private readonly Parameter _parameter;
 
-        public ParameterAdapter(Domain domain, Parameter parameter) : base(domain)
+        public ParameterAdapter(Domain domain, Parameter parameter) : base(domain, parameter.Operation)
         {
             _parameter = parameter;
         }
@@ -41,7 +42,7 @@ namespace Badass.Templating.Classes
             get
             {
                 return _parameter?.Attributes?.userEditable == true || IsCustomType || IsCustomArrayType || (_parameter.RelatedTypeField != null &&
-                                                                       _parameter.RelatedTypeField.IsUserEditable());
+                                                                       _parameter.RelatedTypeField.IsCallerProvided);
             }
         }
 
@@ -60,6 +61,21 @@ namespace Badass.Templating.Classes
                 }
                 
                 return Util.FormatClrType(_parameter.ClrType);
+            }
+        }
+        
+        public string ApiResolvedClrType
+        {
+            get
+            {
+                if (IsCustomType)
+                {
+                    return Util.CSharpNameFromName(_parameter.ProviderTypeName) + "Model";
+                }
+                else
+                {
+                    return ResolvedClrType;
+                }
             }
         }
 
@@ -112,5 +128,18 @@ namespace Badass.Templating.Classes
                 return null;
             }
         }
+
+        public ClientCustomTypeModel ClientCustomType
+        {
+            get
+            {
+                if (IsCustomTypeOrCustomArray)
+                {
+                    return new ClientCustomTypeModel(CustomType);
+                }
+
+                return null;
+            }
+        } 
     }
 }

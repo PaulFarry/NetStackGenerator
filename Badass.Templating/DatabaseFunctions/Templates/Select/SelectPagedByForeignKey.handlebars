@@ -14,30 +14,40 @@ RETURNS SETOF {{Name}}_result AS
 RETURNS SETOF {{{escape_sql_keyword Name}}} AS
 {{/if}}
 $$
-    
+    DECLARE query_txt text;
     BEGIN
 		
         IF (security_user_id_param is not null) THEN
 		    perform set_config('app.user_id', security_user_id_param::text, true);
         END IF;
 
-        RETURN QUERY
+        query_txt = '
         SELECT
             {{#each Fields}}
             {{{escape_sql_keyword Parent.Name}}}.{{{escape_sql_keyword Name}}}{{#unless @last}},{{/unless}}
             {{/each}}
         FROM {{{escape_sql_keyword Name}}}
         WHERE 
-        {{#each SelectFields}}
-        {{{escape_sql_keyword Parent.Name}}}.{{{escape_sql_keyword Name}}} = {{escape_sql_keyword Parent.FunctionName}}.{{{escape_sql_keyword Name}}} {{#unless @last}}AND{{/unless}}{{#unless ../SoftDelete}};{{/unless}}
+        {{#each SelectFieldsWithIndices}}
+        {{{escape_sql_keyword Field.Parent.Name}}}.{{{escape_sql_keyword Field.Name}}} = ${{Index}} {{#unless @last}}AND{{/unless}}
         {{/each}}
 		{{#if SoftDelete}}
-        AND deleted_date is NULL;
-        {{/if}}		
+        AND deleted_date is NULL
+        {{/if}}
+        ORDER BY ' || coalesce(quote_ident({{SortField.Name}}), '{{{escape_sql_keyword PrimaryKeyField.Name}}}');
+
+        IF ({{SortDescendingField.Name}} = true) THEN
+            query_txt = query_txt || ' DESC ';
+        END IF;
+        
+        query_txt = query_txt || ' LIMIT ${{PageSizeParameterIndex}} OFFSET ${{OffsetIndex}}';
+        
+        RETURN QUERY EXECUTE query_txt
+        USING {{#each SelectFields}} {{escape_sql_keyword Parent.FunctionName}}.{{{escape_sql_keyword Name}}},{{/each}} {{PageSizeField.Name}}, {{PageSizeField.Name}} * {{PageNumberField.Name}};
 
     END
 $$
-  LANGUAGE plpgsql VOLATILE SECURITY INVOKER
+  LANGUAGE plpgsql STABLE SECURITY INVOKER
   COST 100;
 
 REVOKE ALL ON FUNCTION {{FunctionName}} ({{#each SelectInputFields}}{{ProviderTypeName}}{{#if HasSize}}({{Size}}){{/if}}{{#unless @last}},{{/unless}}{{/each}}) FROM public;
@@ -45,4 +55,4 @@ REVOKE ALL ON FUNCTION {{FunctionName}} ({{#each SelectInputFields}}{{ProviderTy
 GRANT EXECUTE ON FUNCTION {{FunctionName}} ({{#each SelectInputFields}} {{ProviderTypeName}}{{#if HasSize}}({{Size}}){{/if}}{{#unless @last}},{{/unless}} {{/each}}) TO web_app_role;
 
 COMMENT ON FUNCTION {{FunctionName}} ({{#each SelectInputFields}} {{ProviderTypeName}}{{#if HasSize}}({{Size}}){{/if}}{{#unless @last}},{{/unless}} {{/each}})
-    IS '{"applicationtype":"{{Name}}", "generated":true, "fullName":"{{FunctionName}}" {{#if ReturnsSingle}}, "single_result":true{{/if}} }';
+    IS '{"applicationtype":"{{Name}}", "generated":true, "fullName":"{{FunctionName}}", "paged":true }';

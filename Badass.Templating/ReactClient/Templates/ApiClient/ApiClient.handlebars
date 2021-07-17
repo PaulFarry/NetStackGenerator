@@ -17,11 +17,21 @@ import { {{cs_name Name}} } from './{{cs_name Name}}'
     import { {{cs_name Item1.Name}} } from '../{{kb_case Item2.Name}}/{{cs_name Item1.Name}}'
 {{/each}}
 
-export class {{cs_name Name}}ApiClient {
+export interface {{ClientApiInterfaceName}} {
+{{#each ApiOperations}}
+    {{#if HasCustomType}}
+        {{cml_case BareName}}(model : {{#if ../IsAttachment}}FormData{{else}}{{cs_name CustomType.Name}} | null{{/if}}) : Promise<IHttpResponse<{{TypeScriptReturn}}>>;
+    {{else}}
+        {{cml_case BareName}}({{#each UserProvidedParameters}}{{cml_case Name}} : {{ResolvedTypescriptType}} | null {{#unless @last}}, {{/unless}}{{/each}}) : Promise<IHttpResponse<{{TypeScriptReturn}}>>;
+    {{/if}}    
+    {{/each}}    
+}
 
-	{{#each Operations}}
-	{{#if UsesModel}}
-	public async {{cml_case BareName}}(model : {{#if ../IsAttachment}}FormData{{else}}{{cs_name Name}}Model{{/if}}) : Promise<IHttpResponse<{{TypeScriptReturn}}>>  {
+export class {{ClientApiTypeName}} implements {{ClientApiInterfaceName}} {
+
+	{{#each ApiOperations}}
+	{{#if HasCustomType}}
+	public async {{cml_case BareName}}(model : {{#if ../IsAttachment}}FormData{{else}}{{cs_name CustomType.Name}} | null{{/if}}) : Promise<IHttpResponse<{{TypeScriptReturn}}>>  {
 		var uri = 'api/{{kb_case ../Name}}/{{cs_name BareName}}';
 		console.log("calling {{Name}} on " + uri);
 		{{#if ../IsAttachment}}

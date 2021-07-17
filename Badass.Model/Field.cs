@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Badass.Model
 {
@@ -51,12 +52,13 @@ namespace Badass.Model
         public Type ClrType { get; set; }
 
         public string ProviderTypeName { get; set; }
+        
+        public bool IsGenerated { get; set; }
+        
+        public bool IsCallerProvided => !IsAutoAssignedIdentity && !IsTrackingDate && !IsDelete && !IsTrackingUser && !IsSearch && !IsExcludedFromResults && !IsGenerated;
 
-        // TODO - convert this to a property
-        public bool IsUserEditable()
-        {
-            return !IsAutoAssignedIdentity && !IsTrackingDate && !IsDelete && !IsTrackingUser && !IsSearch && !IsExcludedFromResults;
-        }
+        public bool IsUserEditable => IsCallerProvided && !IsAttachmentThumbnail && !IsAttachmentContentType;
+
         
         public bool IsTrackingDate => IsDateTime && (Name == CreatedFieldName || Name == ModifiedFieldName || Name == SoftDeleteFieldName);
 
@@ -86,13 +88,21 @@ namespace Badass.Model
                 return IsIdentity && (ClrType == typeof(int) || ClrType == typeof(Guid));
             }
         }
+        
+        public bool IsIntegerAssignedIdentity
+        {
+            get
+            {
+                return IsIdentity && ClrType == typeof(int);
+            }
+        }
 
         public bool IsAttachmentContentType
         {
             get
             {
-                return Type is ApplicationType && Attributes?.isContentType == true || (((ApplicationType) Type).IsAttachment && ClrType == typeof(string) &&
-                       Name == ContentTypeFieldName);
+                return Attributes?.isContentType == true || (UnderlyingType.IsAttachment && ClrType == typeof(string) &&
+                                                             Name == ContentTypeFieldName);
             }
         }
 
@@ -100,11 +110,19 @@ namespace Badass.Model
         {
             get
             {
-                return Type is ApplicationType && (Attributes?.type == ThumbnailFieldType || ((ApplicationType)Type).IsAttachment && IsFile &&
-                                                                                             Name == ThumbnailFieldName);
+                return Attributes?.type == ThumbnailFieldType || (UnderlyingType.IsAttachment && IsFile &&
+                                                                  Name == ThumbnailFieldName);
             }
         }
 
+        public bool IsAttachmentData
+        {
+            get
+            {
+                return IsFile && !IsAttachmentThumbnail;
+            }
+        }
+        
         public bool IsLargeTextContent
         {
             get
@@ -124,6 +142,44 @@ namespace Badass.Model
 
         public bool Edit => Attributes?.edit != null ? Attributes.edit : !IsIdentity;
 
+        public bool IsDisplayField => Attributes?.isDisplayForType != null ? Attributes.isDisplayForType : false;
+
         public bool IsInt => ClrType == typeof(int);
+
+        public Field RelatedTypeField
+        {
+            get
+            {
+                if (Type is ResultType)
+                {
+                    return ((ResultType) Type).RelatedType?.Fields.FirstOrDefault(f => f.Name == Name);
+                }
+
+                if (Type is ApplicationType)
+                {
+                    return this;
+                }
+                
+                return null;
+            }
+        }
+
+        public ApplicationType UnderlyingType
+        {
+            get
+            {
+                if (Type is ApplicationType type)
+                {
+                    return type;
+                }
+
+                if (Type is ResultType resType)
+                {
+                    return resType.RelatedType;
+                }
+
+                return null;
+            }
+        }
     }
 }

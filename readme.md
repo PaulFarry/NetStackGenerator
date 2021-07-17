@@ -25,8 +25,64 @@ Badass attempts to generate a 'full stack' of an application once the database s
 ## Databases ##
 Relational databases provide a rich source of machine-readable information about the entities and their relationships in a domain. Badass uses this, with some augmentation via attributes, to generate the basics of an application. Badass is currently very postgres-centric, but could be enhanced to support other databases in the future.
 
-## Command-Line Arguments ##
-`-h|-?|--help` show help
+## Pre-Requisites ##
+Badass and the apps it generates depend on the following:
+1. Postgres - if you don't have it installed a docker image is probably the easiest way to get started.
+2. The .NET SDK
+3. Node (for building react front-ends)
+4. Git
+
+## Getting Started ##
+To test out badass using the Survey sample application perform the following steps. 
+1. Install the pre-requisites mentioned above
+1. Clone the badass repository
+1. Build the badass solution
+1. Clone the template project base [TODO - provide location]
+1. Run the Survey app .sql file `./Badass.Tests/scripts/survey/001 - survey.sql`. Note down the password that is generated for the user survey_web_user in the output. You will use this later in step 8.
+1. Create a configuration file called `survey.config.json` for the survey application in the build output directory of the badass.console project (probably `./Badass.Console/bin/debug/netcoreapp3.1/`) . You will probably want to customize the "root" location
+```
+{
+  "root": "c:\\path\\to\\your\\app",
+  "name": "SurveyApp",
+  "data-dir": ".\\Data\\Database\\",
+  "ConnectionStrings": {
+    "application-db": "Server=127.0.0.1;Port=5432;Database=survey;User Id=postgres;Password=secret_password;"
+  }
+}
+```
+7. Run the badass console by navigating to the Badass.Console app build output directory and running `badass -u -react -c survey -n --tmplt <path to template project from step 6 above> --brand-color #5FD980` 
+1. Open the root location specified in the config file you created in step 6 above, and open the `appsettings.json`. Fix up the connection string. The script `001 - survey.sql` creates a user called survey_web_user, and generates a random password for the user which it prints to the output. Assuming you're connecting to a local postgres db running on the standard port the connection string would be `"Server=127.0.0.1;Port=5432;Database=survey;User Id=survey_web_user;Password=<output from script>;"`
+1. Build your new application. Building the app for the first time takes a while, because it does an NPM restore to build the react front-end.
+1. To re-generate your app after a db schema change run the .sql file located in .sql file `./Badass.Tests/scripts/survey/002 - additional fields.sql`
+1. Re-generate your application from the Badass.Console folder (the same location as step 7 above) by running `badass -u -react -c survey -del`
+
+### Command-Line Arguments ###
+```
+      --brand-color=VALUE    Brand Color for new project. Only applicable when -n or --new option is specified
+  -c, --config=VALUE         JSON configuration file to use.
+      --data-fldr, --database-code-folder=VALUE
+                             the root folder to generate database code into.
+      --data-test-fldr, --database-test-folder=VALUE
+                             the root folder to generate database test helpers into.
+      --dbg, --debug         Attach Debugger on start
+      --del                  delete generated files before re-generating
+      --flutter              Generate a Flutter client for application
+  -h, -?, --help             show this message and exit
+      --logo=VALUE           SVG logo for new project. Only applicable when -n or --new option is specified
+      --name=VALUE           Name of the application. Used for default C# namespace for generated items
+  -n, --new                  Generate a new project
+      --no-policy            Globally disable generation of security policies
+      --no-test-repo         Disable generation of test repositories
+  -r, --root=VALUE           the root folder to generate code into.
+      --react                Change the web UI generated to be React
+      --test-data=VALUE      Generate test data of the specified size for empty tables.
+      --tmplt=VALUE          Template project directory
+  -t, --type=VALUE           Only generate for a single type (for debugging)
+  -u, --update-db-operations Update database with generated operations
+  -v                         increase debug message verbosity
+  -x, --exclude=VALUE        Exclude schema
+```
+
 
 ## Configuration ##
 Badass uses a combination of command-line arguments and configuration to control its behaviour. Longer, infrequently changing, and more tedious to type settings like paths and database connection strings should be stored config. 
@@ -79,6 +135,7 @@ Attributes are set as a JSON text string 'comment' on the respective database en
 - apiConstructor: "generate"|"none" - when set to "generate" a constructor is generated for the API controller. When set to none no constructur is generated, so a custom constructor can be added to a partial class. Defaults to "generate".
 - addMany: true|false - When set to true creates array-based add/insert operations to allow multiple entities to be added via a single call. Defaults to false.
 - apiControllerBaseClass: string - the name of the custom controller that the API controller should inherit from. Defaults to `BaseController` (a type which you will need to created).
+- paged: true|false - When set to true creates paged select all/select all for display operations for this type. Defaults to false.
 
 ### Function Level ###
 - applicationtype:[type name] on a function acts as a hint that that type should be returned by the function wrapper
@@ -94,6 +151,7 @@ Attributes are set as a JSON text string 'comment' on the respective database en
 - apiHooks: true|false - when set to true custom 'before' and 'after' methods are called prior to the generated API code being called. Defaults to false.
 - single_result: true|false - when set to true it causes the generated repository and API operations to return singular items instead of lists. Defaults to false.
 - fullName: string - used to get around the 63 byte length limit of postgres entities. The pattern of <entity>_<operation> often leads to names greater than 63 characters.
+- paged: true|false - indicates that the operation supports paging. Defaults to false.
 
 ### Field Level ### 
 - largeContent : true|false - Signals to UI generators when set to true that a particular field should be displayed with more screen area. Defaults to false.
@@ -105,8 +163,15 @@ Attributes are set as a JSON text string 'comment' on the respective database en
 							 Defaults to empty.
 - add: true|false - When set to false excludes the field from add operations and from add UI. Default to true.
 - edit: true|false - When set to false excludes the field from edit operations and from edit UI. Default to true.
+- isDisplayForType: true|false - When set to true this field becomes the 'summary' that is shown in other places when referring to that type. For example a 'Name' field might be isDisplayType:true for a product or person. Defaults to false.
 
 Postgres SQL Syntax for adding comments to fields is
 ```sql
 COMMENT ON COLUMN public.foo.bar IS '{"rank": 1}';
 ```
+
+### Switching to AAD for Auth ###
+The generated solution uses IdentityServer for Authentication by default. To switch to AAD for authentication perform the following steps.
+- add a reference to nuget package `Microsoft.Identity.Web`
+- modify startup.cs to remove IdentityServer calls
+More info is available [in this quick-start](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-v2-aspnet-core-webapp)

@@ -22,11 +22,21 @@ namespace Badass.Model
         public Domain Domain { get; }
 
         public List<Field> Fields { get; }
-
-        // TODO - this assumes the first text field is the best "summary" of a thing
-        // which may not be the case. We could use some attributes to control which field(s) make up the 
-        // "summary" for a related type
-        public Field DisplayField => Fields.OrderBy(f => f.Rank).FirstOrDefault(f => f.ClrType == typeof(string));
+        
+        public Field DisplayField
+        {
+            get
+            {
+                var displayField = Fields.OrderBy(f => f.Order).FirstOrDefault(f => f.IsDisplayField);
+                if (displayField != null)
+                {
+                    return displayField;
+                }
+                return Fields.OrderBy(f => f.Rank).FirstOrDefault(f => f.ClrType == typeof(string));
+            }
+        }
+        
+        
 
         public dynamic Attributes { get; set; }
     }
