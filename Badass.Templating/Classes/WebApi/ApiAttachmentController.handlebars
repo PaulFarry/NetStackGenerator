@@ -38,7 +38,7 @@ namespace {{cs_name Namespace}}.Controllers
         }
         {{/if}}        
 
-        {{#unless AllowAnonGet}}[Authorize]{{/unless}}
+        {{#if AllowAnonGet}}[AllowAnonymous]{{else}}[Authorize]{{/if}}
 		[HttpGet("{id}")]
         [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -56,7 +56,7 @@ namespace {{cs_name Namespace}}.Controllers
         }
 
         {{#if HasThumbnail}}
-        {{#unless AllowAnonGet}}[Authorize]{{/unless}}
+        {{#if AllowAnonGet}}[AllowAnonymous]{{else}}[Authorize]{{/if}}
         [HttpGet("[action]")]
         [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)] 
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -84,7 +84,7 @@ namespace {{cs_name Namespace}}.Controllers
         {{/if}}
 
         {{#each Operations}}
-        {{#unless AllowAnon}}[Authorize]{{/unless}}
+        {{#if AllowAnon}}[AllowAnonymous]{{else}}[Authorize]{{/if}}
 		{{#if UsesModel}}
 		[Http{{HttpMethod}}("[action]")]
 		public async {{#if NoResult}}Task{{else}}Task<{{{Returns}}}>{{/if}} {{cs_name BareName}}([FromForm]{{cs_name Name}}Model model)
