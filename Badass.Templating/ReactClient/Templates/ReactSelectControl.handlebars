@@ -33,6 +33,12 @@ export class {{cs_name Name}}Select extends Component<{{cs_name Name}}SelectProp
         this.getSelectData();
     }
 
+    componentDidUpdate(prevProps: Readonly<{{cs_name Name}}SelectProps>, prevState: Readonly<{{cs_name Name}}SelectState>, snapshot?: any) {
+        if (prevProps.value != this.props.value) {
+            this.setState({value: this.props.value});
+        }
+    }
+
 	handleChange(item : any, actionMeta: any) {
         this.setState({error: this.state.error, data: this.state.data, value: item.value, loading: this.state.loading });
 		if (this.props.onChange) {
