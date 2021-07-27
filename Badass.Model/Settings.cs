@@ -70,6 +70,8 @@ namespace Badass.Model
         public string LogoFileName { get; set; }
         
         public string TemplateProjectDirectory { get; set; }
+        
+        public string TemplateBranchName { get; set; }
     }
 
     public enum WebUIType

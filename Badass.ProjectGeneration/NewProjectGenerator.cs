@@ -4,6 +4,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using Badass.Model;
 using Badass.Templating;
+using LibGit2Sharp;
 using Serilog;
 
 namespace Badass.ProjectGeneration
@@ -115,10 +116,40 @@ namespace Badass.ProjectGeneration
                 Log.Fatal("Unable to copy base project. Template Project Directory is not specified. This can be specified on the command-line via the -tmplt command-line switch, or via configuration with the template-dir config value.");
                 throw new InvalidOperationException("Template project directory not specified");
             }
+
+            if (!string.IsNullOrEmpty(_settings.NewAppSettings.TemplateBranchName))
+            {
+                SwitchTemplateToBranch();
+            }
             
             Log.Information("Copying Base Solution");
             var source = _settings.NewAppSettings.TemplateProjectDirectory; 
             CopyDirectory(source, _settings.RootDirectory);
+        }
+
+        private void SwitchTemplateToBranch()
+        {
+            try
+            {
+                var branchName = _settings.NewAppSettings.TemplateBranchName;
+                Log.Information("Switching template to branch {BranchName}", branchName);
+                using (var repo = new Repository(_settings.NewAppSettings.TemplateProjectDirectory))
+                {
+                    var branch = repo.Branches.FirstOrDefault(b => b.FriendlyName == branchName);
+                    if (branch != null)
+                    {
+                        Commands.Checkout(repo, branch);
+                    }
+                    else
+                    {
+                        Log.Error("Unable to find branch {BranchName}", branchName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Unable to switch template to branch {BranchName}", _settings.NewAppSettings.TemplateBranchName);
+            }
         }
 
         private void UpdateBrandColour()

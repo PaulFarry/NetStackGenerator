@@ -116,6 +116,7 @@ namespace Badass.Console
                 { "react", "Set the web UI generated to be React", r => {if (r != null) s.WebUIType = WebUIType.React; } },
                 { "test-data=", "Generate test data of the specified size for empty tables.", t => s.TestDataSize = int.Parse(t) },
                 { "tmplt=", "Template project directory", t => { if (t != null) { s.NewAppSettings.TemplateProjectDirectory = t; } }},
+                { "tmplt-brnch=", "Template branch name.", brnch => { if (brnch != null) { s.NewAppSettings.TemplateBranchName = brnch; } }},
                 { "t|type=", "Only generate for a single type (for debugging)", t => s.TypeName = t },
                 { "u|update-db-operations",  "Update database with generated operations", u => s.AddGeneratedOptionsToDatabase = u != null },
                 { "v", "increase debug message verbosity", v => { if (v != null) ++s.Verbosity; } },

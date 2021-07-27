@@ -19,8 +19,8 @@ create table government_area_logo (
                               id serial primary key not null,
                               name text not null,
                               mime_type text not null,
-                              thumbnail bytea not null,
                               contents bytea not null,
+                              thumbnail bytea not null,
                               created_by int references "user" (id) not null,
                               created timestamp with time zone not null,
                               modified_by int references "user"(id),
@@ -35,6 +35,9 @@ create table government_area (
                                  name text not null,
                                  logo_id int references government_area_logo(id),
                                  color char(7),
+                                 city_town text not null,
+                                 state varchar(100) not null,
+                                 country varchar(100) not null,
                                  created_by int not null references "user"(id),
                                  created timestamp with time zone not null,
                                  modified_by int references "user"(id),
@@ -116,6 +119,23 @@ create table address_validation_status (
                                            modified_by int references "user"(id),
                                            modified timestamp with time zone
 );
+
+insert into address_validation_status(id, name, created_by, created)
+values (1, 'Not Validated', 1, clock_timestamp());
+
+insert into address_validation_status(id, name, created_by, created)
+values (2, 'Validated', 1, clock_timestamp());
+
+insert into address_validation_status(id, name, created_by, created)
+values (3, 'No Matches', 1, clock_timestamp());
+
+insert into address_validation_status(id, name, created_by, created)
+values (4, 'Multiple Matches', 1, clock_timestamp());
+
+insert into address_validation_status(id, name, created_by, created)
+values (5, 'Error', 1, clock_timestamp());
+
+ALTER SEQUENCE address_validation_status_id_seq RESTART WITH 6; -- users probably shouldn't be adding values here either
 
 create table address (
                          id serial primary key not null,
