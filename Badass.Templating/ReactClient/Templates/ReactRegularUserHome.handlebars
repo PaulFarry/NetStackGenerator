@@ -20,12 +20,12 @@ export class RegularUserHome extends Component<any,HomeState> {
     }
 
     render() {
-        return (<div>Welcome, regular user.
+        return (<>Welcome, regular user.
              
                 {{#each RelevantTypesToUser}}
                     <{{cs_name SelectAllType.Name}}List/>
                 {{/each}}
 
-             </div>);
+             </>);
     }
 }
