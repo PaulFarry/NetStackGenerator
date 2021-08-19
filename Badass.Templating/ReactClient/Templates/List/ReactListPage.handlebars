@@ -2,7 +2,7 @@
 import React, { FunctionComponent, useRef, useEffect, useState } from 'react';
 
 // material imports
-import {Grid, Paper, TableHead, TableContainer, TableBody, Table} from "@material-ui/core";
+import {Grid, Paper, TableHead, TableContainer, TableBody, Table, makeStyles} from "@material-ui/core";
 
 // other libraries
 import { Link } from 'react-router-dom';
@@ -35,12 +35,22 @@ interface {{cs_name Name}}ListProps {
     api? : {{UnderlyingType.ClientApiInterfaceName}} | null;
 }
 
+const useStyles = makeStyles((theme) => ({
+    paper: {
+        padding: theme.spacing(2),
+        display: 'flex',
+        overflow: 'auto',
+        flexDirection: 'column',
+    },
+}));
+
 export const {{cs_name Name}}List : FunctionComponent<{{cs_name Name}}ListProps> = (props: {{cs_name Name}}ListProps) => {
 
     const api : {{UnderlyingType.ClientApiInterfaceName}} = props.api ? props.api : new {{UnderlyingType.ClientApiTypeName}}();
     const rendering: {{cs_name Name}}ListRendering = new {{cs_name Name}}ListRendering();
     const [state , setState] = useState<{{cs_name Name}}ListState>({data: props.dataProvided ? props.data ? props.data : [] : [], loading : !props.dataProvided, error: false});
     const mounted = useRef();
+    const classes = useStyles();
 
     useEffect(() => {
         {{#if HasOperations}}
@@ -94,7 +104,7 @@ export const {{cs_name Name}}List : FunctionComponent<{{cs_name Name}}ListProps>
 
         return (
             <Grid item xs={12}>
-                <Paper>
+                <Paper className={classes.paper}>
                 { renderHeading() }                
                 <p>{renderDescription()}</p>
                 {contents}
