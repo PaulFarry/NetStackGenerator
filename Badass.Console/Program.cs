@@ -144,7 +144,7 @@ namespace Badass.Console
             settings.ConnectionString = configuration.GetConnectionString("application-db");
             if (string.IsNullOrEmpty(settings.ConnectionString))
             {
-                System.Console.WriteLine("Connection string has not been configured. Provide an entry in the appsettings.json");
+                System.Console.WriteLine("Connection string has not been configured. Provide an entry in the codegen.json");
                 return false;
             }
 
@@ -153,7 +153,7 @@ namespace Badass.Console
                 settings.RootDirectory = configuration.GetValue<string>("root");
                 if (string.IsNullOrEmpty(settings.RootDirectory))
                 {
-                    System.Console.WriteLine("root folder has not been specified. You can provide an entry for 'root' in the appsettings.json, or provide one using the -r command-line argument");
+                    System.Console.WriteLine("root folder has not been specified. You can provide an entry for 'root' in the codegen.json, or provide one using the -r command-line argument");
                     return false;
                 }
             }
