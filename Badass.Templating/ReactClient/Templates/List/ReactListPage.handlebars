@@ -2,7 +2,8 @@
 import React, { FunctionComponent, useRef, useEffect, useState } from 'react';
 
 // material imports
-import { TableHead, TableContainer, TableBody, Table, makeStyles } from "@mui/material";
+import { TableHead, TableContainer, TableBody, Table, Fab, Grid } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
 
 // other libraries
 import { Link } from 'react-router-dom';
@@ -12,7 +13,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { {{cs_name Name}} } from '../{{cs_name Name}}';
 import { {{cs_name Name}}Row } from './{{cml_case Name}}Row';
 import { {{cs_name Name}}Header } from './{{cml_case Name}}Header';
-import { AnimateIn } from "../../../controls/animate-in";
 import { {{UnderlyingType.ClientApiInterfaceName}}, {{UnderlyingType.ClientApiTypeName}} } from '../{{cml_case UnderlyingType.Name}}ApiClient';
 import { Loading } from '../../../controls/loading';
 import {{cs_name Name}}ListRendering from './{{cml_case Name}}ListRendering';
@@ -99,9 +99,13 @@ export const {{cs_name Name}}List : FunctionComponent<{{cs_name Name}}ListProps>
                 {contents}
                 {{has UnderlyingType.AddOperations}}
                 {props.hideAddButton ? null :
-                    (<Link className="btn btn-primary" to={ {pathname: '/{{kb_case UnderlyingType.Name}}/add' , state: { linkedType: props.linkedType, linkedId: props.linkedId}} }>
-                            <FontAwesomeIcon icon={faPlus} className="mr-1" />Add {{UnderlyingType.HumanizedName}}
-                        </Link>)
+                    (
+                        <Grid container direction="column" alignItems="flex-end">
+                            <Fab size="medium" color="primary" aria-label="add {{UnderlyingType.HumanizedName}}" component={Link} to={ {pathname: '/{{kb_case UnderlyingType.Name}}/add' , state: { linkedType: props.linkedType, linkedId: props.linkedId}} }>
+                                <AddIcon />
+                            </Fab>
+                        </Grid>
+                    )
                 }
                 {{/has}}
             </React.Fragment>
