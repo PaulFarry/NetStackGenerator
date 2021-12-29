@@ -11,7 +11,7 @@ import { Redirect } from 'react-router-dom'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import RatingInput  from '../../controls/rating/ratingInput';
-import {TextField} from "@mui/material";
+import {TextField, Button} from "@mui/material";
 
 
 // sub-components for {{cs_name Name}} 
@@ -357,7 +357,7 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
                                             {{#if IsColor}}
 								<Field id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" type="color" className={'form-control' + (getIn(formik.errors, '{{NameWithPathCamelCase}}') && getIn(formik.touched, '{{NameWithPathCamelCase}}') ? ' is-invalid' : '')} placeholder="Enter {{hmn Name}}" />                                
 										    {{else}}
-								<TextField id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" value={ formik.values.{{NameWithPathSafeCamelCase}} } onChange={formik.handleChange} label="{{hmn Field}}" {{#if Field.IsRequired}}required={true}{{/if}}  type="{{input_type ClrType}}" error={ this.hasErrror('{{NameWithPathCamelCase}}', formik)} placeholder="Enter {{hmn Name}}" />                                
+								<TextField id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" value={ formik.values.{{NameWithPathSafeCamelCase}} } onChange={formik.handleChange} onBlur={formik.handleBlur} label="{{hmn Field}}" {{#if Field.IsRequired}}required={true}{{/if}}  type="{{input_type ClrType}}" error={ this.hasErrror('{{NameWithPathCamelCase}}', formik)} placeholder="Enter {{hmn Name}}" />                                
                                             {{/if}}    
                                         {{/if}}
 									{{/if}}
@@ -371,8 +371,8 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
 					{{/each}}
 					<div className="row">
 						<div className="col-sm-10 offset-sm-2">
-							<input className="btn btn-primary mr-1" type="submit" value="Save" />
-							<button type="button" className="btn btn-outline-secondary" onClick={this.cancelSave}>Cancel</button>
+                            <Button color="primary" variant="contained" type="submit">Save</Button>
+                            <Button variant="outlined" onClick={this.cancelSave}>Cancel</Button>
 						</div>						
 					</div>
                 </Form>
