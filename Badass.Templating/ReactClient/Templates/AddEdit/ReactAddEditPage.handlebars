@@ -11,6 +11,8 @@ import { Redirect } from 'react-router-dom'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import RatingInput  from '../../controls/rating/ratingInput';
+import {TextField} from "@mui/material";
+
 
 // sub-components for {{cs_name Name}} 
 import { {{cs_name Name}} } from './{{cs_name Name}}';
@@ -335,7 +337,6 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
 						</div>
 						{{else}}
 						<div className="form-group row">
-							<label className="col-sm-2 col-form-label" htmlFor="{{NameWithPathCamelCase}}">{{hmn Field}}{{#if Field.IsRequired}}<span className='required-indicator'>*</span>{{/if}}</label>
 							<div className="col-sm-10">
 							{{#if Field.HasReferenceType}}
 							<Field id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" component={ {{cs_name Field.ReferencesType.Name}}Select } value={ {{../CurrentOperation.StatePath}}?.{{NameWithPathSafeCamelCase}} } className={(getIn(errors,'{{NameWithPathCamelCase}}') && getIn(touched, '{{NameWithPathCamelCase}}') ? 'invalid-select' : '')} {{#unless Field.ReferencesType.IsReferenceData}} readonly={this.{{cml_case Name}} != null} {{/unless}} />
@@ -359,7 +360,7 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
                                             {{#if IsColor}}
 								<Field id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" type="color" className={'form-control' + (getIn(errors, '{{NameWithPathCamelCase}}') && getIn(touched, '{{NameWithPathCamelCase}}') ? ' is-invalid' : '')} placeholder="Enter {{hmn Name}}" />                                
 										    {{else}}
-								<Field id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" type="{{input_type ClrType}}" className={'form-control' + (getIn(errors, '{{NameWithPathCamelCase}}') && getIn(touched, '{{NameWithPathCamelCase}}') ? ' is-invalid' : '')} placeholder="Enter {{hmn Name}}" />                                
+								<TextField id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" label="{{hmn Field}}" {{#if Field.IsRequired}}required={true}{{/if}}  type="{{input_type ClrType}}" error={ (getIn(errors, '{{NameWithPathCamelCase}}') && getIn(touched, '{{NameWithPathCamelCase}}'))} placeholder="Enter {{hmn Name}}" />                                
                                             {{/if}}    
                                         {{/if}}
 									{{/if}}
