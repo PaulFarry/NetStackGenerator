@@ -11,7 +11,7 @@ import { Redirect } from 'react-router-dom'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import RatingInput  from '../../controls/rating/ratingInput';
-import {TextField, Button} from "@mui/material";
+import {TextField, Button, Rating} from "@mui/material";
 
 
 // sub-components for {{cs_name Name}} 
@@ -352,7 +352,7 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
                                 }} />  
 									{{else}}
 										{{#if IsRating}}
-								<RatingInput name="{{NameWithPathCamelCase}}" />
+								<Rating id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" value={ formik.values.{{NameWithPathSafeCamelCase}} } onChange={formik.handleChange} onBlur={formik.handleBlur}/>
 										{{else}}
                                             {{#if IsColor}}
 								<Field id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" type="color" className={'form-control' + (getIn(formik.errors, '{{NameWithPathCamelCase}}') && getIn(formik.touched, '{{NameWithPathCamelCase}}') ? ' is-invalid' : '')} placeholder="Enter {{hmn Name}}" />                                

@@ -135,7 +135,7 @@ namespace Badass.Model
 
         public int Rank => Attributes?.rank != null ? (int)Attributes?.rank : RankOffset + Order;
 
-        public bool IsRating => ((this.ClrType) == typeof(int) || (this.ClrType) == typeof(short)) &&
+        public bool IsRating => (ClrType == typeof(int) || ClrType == typeof(short) || ClrType == typeof(int?) || ClrType == typeof(short?)) &&
                                 Attributes?.isRating == true;
 
         public bool Add => Attributes?.add != null ? Attributes.add : true;

@@ -149,6 +149,7 @@ create table address (
                          validation_code text,
                          latitude float,
                          longitude float,
+                         service_access smallint,
                          validation_status_id int references address_validation_status(id),
                          error_message text,
                          search_content tsvector,
@@ -159,6 +160,7 @@ create table address (
 );
 
 COMMENT ON COLUMN public.address.display IS '{"isDisplayForType": true}';
+COMMENT ON COLUMN public.address.service_access IS '{"isRating": true}';
 
 create table waste_type (
                             id serial primary key not null,
