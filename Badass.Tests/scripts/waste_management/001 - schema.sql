@@ -189,9 +189,38 @@ create table service_type (
                               modified timestamp with time zone
 );
 
+create table schedule_frequency (
+    id serial primary key not null,
+    name text not null,
+    created_by int not null references "user"(id),
+    created timestamp with time zone not null,
+    modified_by int references "user"(id),
+    modified timestamp with time zone
+);
+
+create table schedule (
+    id serial primary key not null,
+    name text not null,
+    apply_from timestamp with time zone not null,
+    apply_to timestamp with time zone,
+    frequency_id int not null references schedule_frequency(id),
+    monday bool not null,
+    tuesday bool not null,
+    wednesday bool not null,
+    thursday bool not null,
+    friday bool not null,
+    saturday bool not null,
+    sunday bool not null,    
+    created_by int not null references "user"(id),
+    created timestamp with time zone not null,
+    modified_by int references "user"(id),
+    modified timestamp with time zone  
+);
+
 create table bin (
                      id serial primary key not null,
                      address_id int references address(id),
+                     schedule_id int not null references schedule(id),
                      waste_type_id int not null references waste_type(id),
                      bin_size_id int not null references bin_size(id),
                      service_type_id int not null references service_type(id),
@@ -200,6 +229,8 @@ create table bin (
                      modified_by int references "user"(id),
                      modified timestamp with time zone
 );
+
+
 
 DO
 $$
@@ -254,6 +285,8 @@ grant usage, select on bin_size_id_seq to web_app_role;
 grant usage, select on service_type_id_seq to web_app_role;
 grant usage, select on bin_id_seq to web_app_role;
 grant usage, select on government_area_logo_id_seq to web_app_role;
+grant usage, select on schedule_frequency_id_seq to web_app_role;
+grant usage, select on schedule_id_seq to web_app_role;
 
 SET search_path TO "public";
 
