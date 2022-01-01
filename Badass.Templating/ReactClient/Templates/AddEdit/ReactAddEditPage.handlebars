@@ -8,8 +8,6 @@ import { ErrorControl } from '../../controls/error-control';
 import { Loading } from '../../controls/loading';
 import {AnimateIn} from "../../controls/animate-in";
 import { Redirect } from 'react-router-dom'
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import {Button, FormControlLabel, FormGroup, Rating, TextField} from "@mui/material";
 import {TriStateCheckbox} from "../../controls/TriStateCheckbox";
 import { DateTimePicker } from '@mui/lab';
@@ -340,7 +338,11 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
 								{{#if IsDateTime}}
                                 <DateTimePicker
                                     renderInput={(props) => <TextField id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" onBlur={formik.handleBlur} {{#if Field.IsRequired}}required={true}{{/if}} error={ this.hasError('{{NameWithPathCamelCase}}', formik)} {...props} />}
-                                    label="{{hmn Field}}" 
+                                    label="{{hmn Field}}"
+                                    {{#unless Field.IsRequired}}
+                                    clearable={true}
+                                    clearText="clear"
+                                    {{/unless}}
                                     value={ formik.values.{{NameWithPathSafeCamelCase}} }
                                     onChange={(newValue) => {
                                         formik.setFieldValue("{{NameWithPathCamelCase}}", newValue);
@@ -351,10 +353,16 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
                                 <TextField id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" value={ formik.values.{{NameWithPathSafeCamelCase}} } onChange={formik.handleChange} onBlur={formik.handleBlur} label="{{hmn Field}}" {{#if Field.IsRequired}}required={true}{{/if}}  type="{{input_type ClrType}}" error={ this.hasError('{{NameWithPathCamelCase}}', formik)} placeholder="Enter {{hmn Name}}" multiline={true} maxRows={5} />
                                     {{else}}
 									{{#if IsFile}}
-								<input type="file" id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" className={'form-control' + (getIn(formik.errors, '{{NameWithPathCamelCase}}') && getIn(formik.touched, '{{NameWithPathCamelCase}}') ? ' is-invalid' : '')} placeholder="Enter {{hmn Name}}" onChange={(event: any) => {
+								<input hidden type="file" id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" onChange={(event: any) => {
                                         formik.setFieldValue("{{NameWithPathCamelCase}}", event.currentTarget.files[0]);
-                                }} />  
-									{{else}}
+                                }} />
+                                        <label htmlFor="{{NameWithPathCamelCase}}">
+                                            <Button variant="contained" component="span" color="primary">
+                                                Choose {{hmn Name}}
+                                            </Button>
+                                            {formik.values.{{NameWithPathSafeCamelCase}}?.name}
+                                        </label>
+                                    {{else}}
 										{{#if IsRating}}
 								<Rating id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" value={ formik.values.{{NameWithPathSafeCamelCase}} } onChange={formik.handleChange} onBlur={formik.handleBlur}/>
 										{{else}}

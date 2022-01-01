@@ -11,7 +11,7 @@ namespace Badass.Templating.Classes.Adapters
         
         public ClientCustomTypeModel(OperationAdapter operation, Domain domain)
         {
-            Name = operation.Name + "Model";
+            Name = operation.Name + NamingConventions.ModelClassNameSuffix;
             Fields = operation.UserProvidedParameters.Select(p => p.RelatedTypeField).ToList();
             _domain = domain;
             _namespace = operation.Namespace;
