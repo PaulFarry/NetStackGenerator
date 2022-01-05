@@ -333,7 +333,7 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
 						<div className="form-group row">
 							<div className="col-sm-10">
 							{{#if Field.HasReferenceType}}
-							<Field id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" component={ {{cs_name Field.ReferencesType.Name}}Select } value={ {{../CurrentOperation.StatePath}}?.{{NameWithPathSafeCamelCase}} } className={(getIn(formik.errors,'{{NameWithPathCamelCase}}') && getIn(formik.touched, '{{NameWithPathCamelCase}}') ? 'invalid-select' : '')} {{#unless Field.ReferencesType.IsReferenceData}} readonly={this.{{cml_case Name}} != null} {{/unless}} />
+							<Field id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" component={ {{cs_name Field.ReferencesType.Name}}Select } value={ {{../CurrentOperation.StatePath}}?.{{NameWithPathSafeCamelCase}} } label="{{hmn Field}}" {{#unless Field.ReferencesType.IsReferenceData}} readonly={this.{{cml_case Name}} != null} {{/unless}} />
 							{{else}}
 								{{#if IsDateTime}}
                                 <DateTimePicker
