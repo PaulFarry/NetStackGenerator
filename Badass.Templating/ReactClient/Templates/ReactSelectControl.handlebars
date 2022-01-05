@@ -15,7 +15,8 @@ interface {{cs_name Name}}SelectProps {
     value : {{get_ts_type IdentityField.ClrType}} | null;
     readonly: boolean;
     onChange: any;
-    field: any; 
+    field: any;
+    error?: boolean;
     className: string;
     api?: {{ClientApiInterfaceName}} | null;
     label?: string;
@@ -28,6 +29,7 @@ export class {{cs_name Name}}Select extends Component<{{cs_name Name}}SelectProp
         super(props);
         this.state = { data: [], value: props.value, loading: true, error: false};
 		this.handleChange = this.handleChange.bind(this);
+        this.onBlur = this.onBlur.bind(this);
     }
 
     componentDidMount() {
@@ -54,6 +56,12 @@ export class {{cs_name Name}}Select extends Component<{{cs_name Name}}SelectProp
         // TODO - "searching large lists version will do things here"
     }
 
+    onBlur(){
+        if (this.props.field.onBlur) {
+            this.props.field.onBlur({target: { value: this.state.value, name: this.props.field.name }});
+        }
+    }
+    
     render{{cs_name Name}}Select(data: {{cs_name SelectAllType.Name}}[]) {
 
         {{#if HasDisplayField}}
@@ -64,7 +72,7 @@ export class {{cs_name Name}}Select extends Component<{{cs_name Name}}SelectProp
         var selected = options.find(o => o.value === this.state.value);
 		
 		return (
-        <Autocomplete options={options} value={selected} onChange={this.handleChange} renderInput={(params) => <TextField {...params} label={this.props.label} />} disabled={this.props.readonly} />
+        <Autocomplete options={options} value={selected} onChange={this.handleChange} renderInput={(params) => <TextField {...params} label={this.props.label} onBlur={this.onBlur} error={this.props.error} />} disabled={this.props.readonly} />
         );
     }
 
