@@ -8,7 +8,7 @@ import { ErrorControl } from '../../controls/error-control';
 import { Loading } from '../../controls/loading';
 import {AnimateIn} from "../../controls/animate-in";
 import { Redirect } from 'react-router-dom'
-import {Button, FormControlLabel, FormGroup, Rating, TextField} from "@mui/material";
+import {Button, FormControlLabel, FormGroup, Grid, Rating, TextField} from "@mui/material";
 import {TriStateCheckbox} from "../../controls/TriStateCheckbox";
 import { DateTimePicker } from '@mui/lab';
 
@@ -320,20 +320,25 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
                 {this.renderTitle()}
 				{{#if IsUpdate}} { this.state.loading ? <Loading /> : null } {{/if}}
 				{ this.state.error ? <ErrorControl message={this.state.message ? this.state.message : ""} /> : null }
-                <Form autoComplete="off">                        
+                <Form autoComplete="off">
+                    <Grid container spacing={2}>
 					{{#each CurrentOperation.UserInputFields}}											
 						{{#if IsBoolean}}
-                        <FormGroup>
-                            <FormControlLabel control={<TriStateCheckbox id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" checked={ formik.values.{{NameWithPathSafeCamelCase}} } onChange={(e:any) => {
-                            formik.setFieldValue('{{NameWithPathCamelCase}}', e.target.checked);
-                            }} />} label="{{#if Field.IsRequired}}*{{/if}}{{hmn Field}}" />
-                            <ErrorMessage name="{{NameWithPathCamelCase}}" component="div" className="invalid-feedback" />
-                        </FormGroup>
-						{{else}}
-						<div className="form-group row">
-							<div className="col-sm-10">
+                        <Grid item xs={12}>
+                            <FormGroup>
+                                <FormControlLabel control={<TriStateCheckbox id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" checked={ formik.values.{{NameWithPathSafeCamelCase}} } onChange={(e:any) => {
+                                formik.setFieldValue('{{NameWithPathCamelCase}}', e.target.checked);
+                                }} />} label="{{#if Field.IsRequired}}*{{/if}}{{hmn Field}}" />
+                                <ErrorMessage name="{{NameWithPathCamelCase}}" component="div" className="invalid-feedback" />
+                            </FormGroup>
+                        </Grid>
+                        {{else}}
+                        <Grid item xs={4}>
+                            {{hmn Field}}
+                        </Grid>
+                        <Grid item xs={8}>
 							{{#if Field.HasReferenceType}}
-							<Field id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" component={ {{cs_name Field.ReferencesType.Name}}Select } value={ {{../CurrentOperation.StatePath}}?.{{NameWithPathSafeCamelCase}} } label="{{hmn Field}}" {{#unless Field.ReferencesType.IsReferenceData}} error={ this.hasError('{{NameWithPathSafeCamelCase}}', formik)} readonly={this.{{cml_case Name}} != null} {{/unless}} />
+							<Field id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" component={ {{cs_name Field.ReferencesType.Name}}Select } value={ {{../CurrentOperation.StatePath}}?.{{NameWithPathSafeCamelCase}} } label="{{hmn Field}}" {{#unless Field.ReferencesType.IsReferenceData}} error={ this.hasError('{{NameWithPathCamelCase}}', formik)} readonly={this.{{cml_case Name}} != null} {{/unless}} />
 							{{else}}
 								{{#if IsDateTime}}
                                 <DateTimePicker
@@ -377,9 +382,8 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
 								{{/if}}
 							{{/if}}
 							<ErrorMessage name="{{NameWithPathCamelCase}}" component="div" className="invalid-feedback" />
-							</div>
-						</div>
-						{{/if}}						
+                        </Grid>
+                        {{/if}}						
 					{{/each}}
 					<div className="row">
 						<div className="col-sm-10 offset-sm-2">
@@ -387,6 +391,7 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
                             <Button variant="outlined" onClick={this.cancelSave}>Cancel</Button>
 						</div>						
 					</div>
+                    </Grid>
                 </Form>
             </div>
 			)}
