@@ -333,10 +333,10 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
                             </FormGroup>
                         </Grid>
                         {{else}}
-                        <Grid item xs={4}>
+                        <Grid item xs={12} md={4}>
                             {{hmn Field}}
                         </Grid>
-                        <Grid item xs={8}>
+                        <Grid item xs={12} md={8}>
 							{{#if Field.HasReferenceType}}
 							<Field id="{{NameWithPathCamelCase}}" name="{{NameWithPathCamelCase}}" component={ {{cs_name Field.ReferencesType.Name}}Select } value={ {{../CurrentOperation.StatePath}}?.{{NameWithPathSafeCamelCase}} } label="{{hmn Field}}" {{#unless Field.ReferencesType.IsReferenceData}} error={ this.hasError('{{NameWithPathCamelCase}}', formik)} readonly={this.{{cml_case Name}} != null} {{/unless}} />
 							{{else}}
@@ -385,12 +385,13 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
                         </Grid>
                         {{/if}}						
 					{{/each}}
-					<div className="row">
-						<div className="col-sm-10 offset-sm-2">
-                            <Button color="primary" variant="contained" type="submit">Save</Button>
-                            <Button variant="outlined" onClick={this.cancelSave}>Cancel</Button>
-						</div>						
-					</div>
+                        <Grid item xs={12} md={4}>
+                            &nbsp;
+                        </Grid>
+                        <Grid item xs={12} md={8}>
+                            <Button variant="outlined" sx={ {width:"100px", float: "right"} } onClick={this.cancelSave}>Cancel</Button>
+                            <Button color="primary" sx={ {width:"100px", marginRight:2, float: "right"} } variant="contained" type="submit">Save</Button>
+                        </Grid>  
                     </Grid>
                 </Form>
             </div>
