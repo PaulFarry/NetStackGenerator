@@ -75,7 +75,9 @@ export class {{cs_name Name}}Detail extends Component<{{cs_name Name}}DetailProp
                 <TableBody>
                     {{#each DisplayFields}}
 					<TableRow>
-                        <TableCell>{{DisplayName}}</TableCell>
+                        <TableCell>
+                            <Typography variant="subtitle2">{{DisplayName}}</Typography>
+                        </TableCell>
                         <TableCell>
 						{{#if IsDateTime}}
 						<DateTimeDisplay date={ data.{{cml_case Name}} } />

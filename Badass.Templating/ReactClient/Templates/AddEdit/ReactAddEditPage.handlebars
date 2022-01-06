@@ -8,7 +8,7 @@ import { ErrorControl } from '../../controls/error-control';
 import { Loading } from '../../controls/loading';
 import {AnimateIn} from "../../controls/animate-in";
 import { Redirect } from 'react-router-dom'
-import {Button, FormControlLabel, FormGroup, Grid, Rating, TextField} from "@mui/material";
+import {Button, FormControlLabel, FormGroup, Grid, Rating, TextField, Typography} from "@mui/material";
 import {TriStateCheckbox} from "../../controls/TriStateCheckbox";
 import { DateTimePicker } from '@mui/lab';
 
@@ -334,7 +334,9 @@ export class {{cs_name Name}}{{OperationNameFriendly}} extends Component<I{{cs_n
                         </Grid>
                         {{else}}
                         <Grid item xs={12} md={4}>
+                            <Typography variant="subtitle2">
                             {{hmn Field}}
+                            </Typography>    
                         </Grid>
                         <Grid item xs={12} md={8}>
 							{{#if Field.HasReferenceType}}
