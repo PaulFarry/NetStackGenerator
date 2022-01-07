@@ -74,7 +74,6 @@
     <EmbeddedResource Include="ReactClient\Templates\ReactComponent.handlebars" />
     <EmbeddedResource Include="ReactClient\Templates\ReactConfirmDeletePage.handlebars" />
     <EmbeddedResource Include="ReactClient\Templates\ReactDetailPage.handlebars" />
-    <EmbeddedResource Include="ReactClient\Templates\ReactListAllEntitiesPage.handlebars" />
     <None Remove="DatabaseFunctions\Templates\InsertType.handlebars" />
     <EmbeddedResource Include="DatabaseFunctions\Templates\InsertType.handlebars" />
     <None Remove="DatabaseFunctions\Templates\InsertBulkTemplate.handlebars" />
@@ -91,6 +90,8 @@
     <EmbeddedResource Include="TestData\TestData.handlebars" />
     <None Remove="Classes\WebApi\ApiAttachmentRequestModel.handlebars" />
     <EmbeddedResource Include="Classes\WebApi\ApiAttachmentRequestModel.handlebars" />
+    <None Remove="ReactClient\Templates\ReactLeftNav.handlebars" />
+    <EmbeddedResource Include="ReactClient\Templates\ReactLeftNavItems.handlebars" />
   </ItemGroup>
 
   <ItemGroup>

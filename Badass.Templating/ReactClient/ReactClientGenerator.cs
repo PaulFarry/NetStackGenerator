@@ -71,10 +71,10 @@ namespace Badass.Templating.ReactClient
         {
             Util.RegisterHelpers(domain.TypeProvider);
             var files = new List<CodeFile>();
-
-            var all = new CodeFile { Name = "all-types.tsx", Contents = GenerateAllPage(domain) };
-            files.Add(all);
-
+            
+            var leftNavItems = new CodeFile { Name = "LeftNavItems.tsx", Contents = GenerateLeftNavItems(domain) };
+            files.Add(leftNavItems);
+            
             var regUserHome = new CodeFile {Name = "RegularUserHome.tsx", Contents = GenerateRegularUserHomepage(domain)};
             files.Add(regUserHome);
 
@@ -156,9 +156,9 @@ namespace Badass.Templating.ReactClient
             return GenerateFromTemplate(new DomainApiAdapter(domain), "ReactRegularUserHome");
         }
 
-        private string GenerateAllPage(Domain domain)
+        private string GenerateLeftNavItems(Domain domain)
         {
-            return GenerateFromTemplate(new DomainApiAdapter(domain), "ReactListAllEntitiesPage");
+            return GenerateFromTemplate(new DomainApiAdapter(domain), "ReactLeftNavItems");
         }
 
         private string GenerateApiClient(ApplicationType type, Domain domain)
