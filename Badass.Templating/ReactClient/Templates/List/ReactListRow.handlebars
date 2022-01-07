@@ -53,63 +53,59 @@ export class {{cs_name Name}}Row extends Component<{{cs_name Name}}RowProps, any
                             {{#if UnderlyingType.IsAttachmentWithThumbnail}}
                             <TableCell> <Thumbnail id={s.id} name={ s.{{cml_case DisplayField.Name}} } entityName="{{kb_case UnderlyingType.Name}}" /> </TableCell>
                             {{/if}}
+                            <TableCell align="right">
 							{{#if UnderlyingType.HasDetails}}
-							<TableCell>
                                 <IconButton component={Link} aria-label={'View'} to={ {
                                     pathname: '/{{kb_case UnderlyingType.Name}}/detail/' + s.id,
                                     state: {
                                         data: s
                                     }
                                 } }><VisibilityIcon /></IconButton>
-                            </TableCell>
 							{{/if}}
 							{{#if UnderlyingType.IsReferenceData}}
 							{/* reference data */}
 							<UserConsumer>
 							{props => {
-								return isInRole(props, "admin") ? (<TableCell>
+								return isInRole(props, "admin") ? (<>
                                 <IconButton component={Link} aria-label={'Edit'} to={ {
                                     pathname: '/{{kb_case UnderlyingType.Name}}/edit/' + s.id,
                                     state: {
                                         data: s
                                     }
                                 } }><EditIcon /></IconButton>
-							</TableCell>) : null;} }
+							</>) : null;} }
 							</UserConsumer>
 							{{#if UnderlyingType.CanDelete}}
 							<UserConsumer>
 							{props => {
-								return isInRole(props, "admin") ? (<TableCell>
+								return isInRole(props, "admin") ? (<>
                                 <IconButton component={Link} aria-label={'Delete'} to={ {
                                     pathname: '/{{kb_case UnderlyingType.Name}}/delete/' + s.id,
                                     state: {
                                         data: s
                                     }
                                 } }><DeleteIcon /></IconButton>
-							</TableCell>) : null; } }
+							</>) : null; } }
 							</UserConsumer>
 							{{/if}}
 							{{else}}
 							{/* non-reference data */}
-							<TableCell>
                                 <IconButton component={Link} aria-label={'Edit'} to={ {
                                     pathname: '/{{kb_case UnderlyingType.Name}}/edit/' + s.id,
                                     state: {
                                         data: s
                                     }
                                 } }><EditIcon /></IconButton>
-							</TableCell>
 							{{#if UnderlyingType.CanDelete}}
-							<TableCell>
                                 <IconButton component={Link} aria-label={'Delete'} to={ {
                                     pathname: '/{{kb_case UnderlyingType.Name}}/delete/' + s.id,
                                     state: {
                                         data: s
                                     }
                                 } }><DeleteIcon /></IconButton>
-							</TableCell>
 							{{/if}}
 							{{/if}}
+                            </TableCell>
                         </TableRow>;
         }
 }
