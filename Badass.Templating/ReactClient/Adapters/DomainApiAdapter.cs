@@ -13,11 +13,16 @@ namespace Badass.Templating.ReactClient.Adapters
             _domain = domain;
         }
 
-        public List<ApplicationType> TypesThatHaveUI
-        {
-            get { return _domain.Types.Where(t => t.GenerateUI).OrderBy(t => t.Name).ToList(); }           
-        }
+        public List<ApplicationType> TypesThatHaveUI => _domain.Types.Where(t => t.GenerateUI).OrderBy(t => t.Name).ToList();
 
+        public List<ApplicationType> NonReferenceTypesThatHaveUI =>
+            TypesThatHaveUI.Where(t => !t.IsReferenceData).ToList();
+
+        public List<ApplicationType> ReferenceTypesThatHaveUI =>
+            TypesThatHaveUI.Where(t => t.IsReferenceData).ToList();
+
+        public bool HasReferenceTypesWithUI => ReferenceTypesThatHaveUI.Any();
+        
         public List<ClientApiAdapter> RelevantTypesToUser
         {
             get
