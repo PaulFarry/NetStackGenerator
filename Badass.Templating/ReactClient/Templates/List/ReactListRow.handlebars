@@ -53,7 +53,7 @@ export class {{cs_name Name}}Row extends Component<{{cs_name Name}}RowProps, any
                             {{#if UnderlyingType.IsAttachmentWithThumbnail}}
                             <TableCell> <Thumbnail id={s.id} name={ s.{{cml_case DisplayField.Name}} } entityName="{{kb_case UnderlyingType.Name}}" /> </TableCell>
                             {{/if}}
-                            <TableCell align="right">
+                            <TableCell align="right" sx={ {whiteSpace:"nowrap"} }>
 							{{#if UnderlyingType.HasDetails}}
                                 <IconButton component={Link} aria-label={'View'} to={ {
                                     pathname: '/{{kb_case UnderlyingType.Name}}/detail/' + s.id,
