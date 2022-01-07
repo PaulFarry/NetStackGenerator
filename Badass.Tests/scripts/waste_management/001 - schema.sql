@@ -120,6 +120,8 @@ create table address_validation_status (
                                            modified timestamp with time zone
 );
 
+COMMENT ON TABLE public.address_validation_status IS '{"type":"reference"}';
+
 insert into address_validation_status(id, name, created_by, created)
 values (1, 'Not Validated', 1, clock_timestamp());
 
@@ -171,6 +173,8 @@ create table waste_type (
                             modified timestamp with time zone
 );
 
+COMMENT ON TABLE public.waste_type IS '{"type":"reference"}';
+
 create table bin_size (
                           id serial primary key not null,
                           name text not null,
@@ -179,6 +183,8 @@ create table bin_size (
                           modified_by int references "user"(id),
                           modified timestamp with time zone
 );
+
+COMMENT ON TABLE public.bin_size IS '{"type":"reference"}';
 
 create table service_type (
                               id serial primary key not null,
@@ -189,6 +195,8 @@ create table service_type (
                               modified timestamp with time zone
 );
 
+COMMENT ON TABLE public.service_type IS '{"type":"reference"}';
+
 create table schedule_frequency (
     id serial primary key not null,
     name text not null,
@@ -197,6 +205,8 @@ create table schedule_frequency (
     modified_by int references "user"(id),
     modified timestamp with time zone
 );
+
+COMMENT ON TABLE public.schedule_frequency IS '{"type":"reference"}';
 
 create table schedule (
     id serial primary key not null,
