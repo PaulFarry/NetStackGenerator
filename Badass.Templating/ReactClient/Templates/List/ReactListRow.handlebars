@@ -69,7 +69,7 @@ export class {{cs_name Name}}Row extends Component<{{cs_name Name}}RowProps, any
 							{/* reference data */}
 							<UserConsumer>
 							{props => {
-								return isInRole(props, "admin") ? (<>
+								return isInRole(props, "{{SecurityRoles.Admin}}") ? (<>
                                 <IconButton component={Link} aria-label={'Edit'} to={ {
                                     pathname: '/{{kb_case UnderlyingType.Name}}/edit/' + s.id,
                                     state: {
@@ -81,7 +81,7 @@ export class {{cs_name Name}}Row extends Component<{{cs_name Name}}RowProps, any
 							{{#if UnderlyingType.CanDelete}}
 							<UserConsumer>
 							{props => {
-								return isInRole(props, "admin") ? (<>
+								return isInRole(props, "{{SecurityRoles.Admin}}") ? (<>
                                 <IconButton component={Link} aria-label={'Delete'} to={ {
                                     pathname: '/{{kb_case UnderlyingType.Name}}/delete/' + s.id,
                                     state: {

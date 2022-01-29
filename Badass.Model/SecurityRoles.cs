@@ -2,9 +2,16 @@
 {
     public class SecurityRoles
     {
-        public const string Anonymous = "anon";
-        public const string User = "user";
-        public const string Admin = "admin";
+        private readonly Settings _settings;
+
+        public SecurityRoles(Settings settings)
+        {
+            _settings = settings;
+        }
+        
+        public string Anonymous => "anon";
+        public string User => "user";
+        public string Admin => _settings.AdminRoleName ?? "admin";
     }
 
     public class SecurityRights

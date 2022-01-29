@@ -11,11 +11,13 @@ namespace Badass.Templating.Classes
     {
         protected readonly SimpleType _type;
         protected readonly Domain _domain;
+        protected readonly SecurityRoles _securityRoles;
 
         public ClassAdapter(SimpleType type, Domain domain)
         {
             _type = type;
             _domain = domain;
+            _securityRoles = new SecurityRoles(domain.Settings);
         }
 
         public string Name => _type.Name;
@@ -110,5 +112,7 @@ namespace Badass.Templating.Classes
                 return !t.IsReferenceData && !t.IsLink && !t.Ignore && !t.IsAttachment;
             }
         }
+
+        public SecurityRoles SecurityRoles => _securityRoles;
     }
 }

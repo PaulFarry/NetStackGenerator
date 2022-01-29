@@ -99,6 +99,7 @@ namespace Badass.Console
                 "Usage: dotnet Badass.Console.dll -r VALUE <Options>",
                 "",
                 "Options:",
+                { "adm|admin-role=", "Name of Admin role. Defaults to 'admin'", r => s.AdminRoleName = r },
                 { "brand-color=", "Brand Color for new project. Only applicable when -n or --new option is specified", bc => s.NewAppSettings.BrandColour = bc },
                 { "c|config=", "JSON configuration file to use.", c => s.ConfigurationFile = c },
                 { "data-fldr|database-code-folder=", "the root folder to generate database code into.", m => s.DataDirectory = m },

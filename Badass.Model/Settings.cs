@@ -61,6 +61,8 @@ namespace Badass.Model
         public string TestDataDirectory { get; set; }
         
         public int? TestDataSize { get; set; }
+        
+        public string AdminRoleName { get; set; }
     }
 
     public class NewAppSettings 
